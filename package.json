@@ -1,0 +1,22 @@
+{
+  "name": "mern-stack-mysql",
+  "version": "1.0.0",
+  "description": "Based on this site \r * [MERN Stack con MySQL - React MySQL CRUD (Context API, TailwindCSS)](https://www.youtube.com/watch?v=dJbd7BYofp4) .\r * [MERN Stack Tutorial - Book Store Project](https://www.youtube.com/watch?v=-42K44A1oMA).\r * [Build REST API with NodeJS, MySQL, Sequelize, Typescript, Express step by step 2022 | REST API MySQL](https://www.youtube.com/watch?v=UcwT1SAvxG0).",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./backend/index.js",
+    "dev": "nodemon ./backend/index.js"
+  },
+  "keywords": [],
+  "author": "Juan David González Piza",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
