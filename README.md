@@ -207,4 +207,108 @@ Remember import `tasksRoutes` from './routes/tasks.routes.js', in "app.js" file.
 
 ### Note: To test the other options in "Visual Studio Code" there are a "Thunder Client" extension.
 
-11. 
+## Create the Table called "tasks" in the **mern_stack_1** Database
+1. Create a "database" directory into "backend", and add the "createTasksTable.js" file, with:
+```js
+    export const sqlCreateTasksTable =
+      "-- Creating `tasks` table  \n" +
+      "CREATE TABLE IF NOT EXISTS `tasks` (\n" +
+      "  `id` BINARY(16) NOT NULL PRIMARY KEY ,\n" + // DEFAULT UNHEX(REPLACE(UUID(),'-',''))
+      "  `title` VARCHAR(128) NOT NULL,\n" +
+      "  `description` VARCHAR(256),\n" +
+      "  `done` BOOLEAN NOT NULL DEFAULT 0,\n" +
+      "  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n" +
+      "  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n" +
+      ");";
+```
+2. Create an "index.js" file into "/backend/database" directory, with the following:
+```js
+    import { pool } from '../config/db.js';
+    import { sqlCreateTasksTable } from './createTasksTable.js';
+
+    export const initAll = async () => {
+      try {
+        const [rows]=await pool.execute(sqlCreateTasksTable);
+        await rows.warningStatus===1?console.log('Table Existed previously'):console.log('Table Created');
+      } catch (error) { console.log(error); }
+    }
+```
+3. Call the `initAll()` method in "app.js" file.
+4. Finally it must create the table in the **mern_stack_1** Database
+
+## Post /Tasks, the Creation or Insertion of the record
+
+1. Add in "app.js" file, two elements below the `const app = express();`.
+```js
+    app.use(express.json());      // parse requests of content-type - application/json
+    app.disable('x-powered-by');  // disable the header X-Powered-By: Express
+```
+2. Add in "task.controllers.js" file for the `createTask` method, this line to show the body: `console.log(req.body);`.
+3. To the activity in **Thunder Client** for `POST` add in _Body_ this JSON:
+```json
+    {
+      "title":"My First Task"
+    }
+```
+And press [Send] button, this must be the aswer:
+```bash
+{ title: 'My First Task' }
+```
+4. Change again the _Body_ in the `POST` of **Thunder Client** activity the JSON for:
+```json
+    {
+      "title":"My First Task",
+      "description":"This is my first task "
+    }
+```
+5. Import `{ pool }` from '../config/db.js', in "tasks.controllers.js" file.
+6. Import `crypto` from 'crypto', in "tasks.controllers.js" file.
+7. 
+6. Change the `createTask` method with this:
+```js
+      const { title, description } = await req.body;
+      const uuid = crypto.randomUUID();
+      try {
+        const result = await pool.query("INSERT INTO tasks(id, title, description) \n" +
+          "VALUES (unhex(replace(?,'-','')), ?,?)", [uuid, title, description])
+        res.status(201).json({
+          ok: true,
+          uuid,
+          title,
+          description,
+          result
+        });
+      } catch (error) {
+        console.log(error);
+        res.status(501).json({
+          ok: false,
+          error
+        });
+      }
+```
+
+## Adding Validation of the each field
+1. Install the `zod` library:
+```bash
+pnpm install zod -E
+```
+2. Create a "schemas" directory on "backend"
+3. Add a "tasks.schemas.js" file.
+4. Import `z` from 'zod', in the "tasks.schemas.js" file.
+5. Add two regex to validate common text and the uuid values:
+```js
+    const regExpText = new RegExp("^[a-zA-Z0-9,.;:-_'\\s]+$");
+    const regExpUuid = new RegExp("^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$");
+```
+6. Complete the values to validate in a `const` of this schema:
+```js
+    const taskSchema = z.object({
+      id: z.optional(z.string().regex(regExpUuid, { message: 'Id is not valid' })),
+      title: z.string({
+        invalid_type_error: 'Title must be a string',
+        required_error: 'Title is required'
+      }).min(5).max(128, { message: 'Title is max 128 length' }).regex(regExpText, { message: 'Title is not valid' }),
+      description: z.string().max(256, { message: 'Description is max 256 length' }).regex(regExpText, { message: 'Description is not valid' }).optional(),
+    });
+```
+7. Export the `ValidateTask`, returning the `safeParse` of the `taskSchema`, all in the "tasks.schemas.js" file.
