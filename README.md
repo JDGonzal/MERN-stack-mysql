@@ -312,3 +312,33 @@ pnpm install zod -E
     });
 ```
 7. Export the `ValidateTask`, returning the `safeParse` of the `taskSchema`, all in the "tasks.schemas.js" file.
+
+## GET/ Tasks, the Reading all the records or one.
+1. Adding the Process in "tasks.controllers.js" file for `getTasks` method:
+```js
+      try {
+          const [rows, fields, error] = await pool.query("SELECT (insert( insert( insert( insert(\n" +
+            "   LCASE(hex(id))\n" +
+            "   ,9,0,'-'), 14,0,'-'), 19,0,'-'), 24,0,'-') ) as id_text , \n" +
+            " title, description, done, created_at, updated_at FROM tasks \n" +
+            "ORDER BY created_at DESC;");
+          res.status(200).json({ ok: true, rows });
+        } catch (error) { res.status(501).json({ ok: false, error }); }
+```
+2. Adding the Process in "tasks.controllers.js" file for `getTask` method:
+```js
+      try {
+        const uuid = req.params.id;
+        const valTastk = await validateTask({ id: uuid, title: 'xoxoxo' }); // I sent any garbage in Title for Validation
+        if (valTastk.error) return res.status(400).json({ ok: false, message: valTastk.error });
+        const [rows, fields, error] = await pool.query("SELECT (insert( insert( insert( insert(\n" +
+          "   LCASE(hex(id))\n" +
+          "   ,9,0,'-'), 14,0,'-'), 19,0,'-'), 24,0,'-') ) as id_text , \n" +
+          " title, description, done, created_at, updated_at FROM tasks \n" +
+          "WHERE  id= unhex(replace(?,'-',''));", [uuid]);
+        if (rows.length === 0) return res.status(404).json({ ok: false, message: "Task not found" });
+        res.status(200).json({ ok: true, rows });
+      } catch (error) { res.status(501).json({ ok: false, error }); }
+```
+### Note: A correction in "task.schemas.js" for `regExpUuid`, using the `\\` insted of `\`.
+
