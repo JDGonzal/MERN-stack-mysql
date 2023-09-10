@@ -236,7 +236,7 @@ Remember import `tasksRoutes` from './routes/tasks.routes.js', in "app.js" file.
 3. Call the `initAll()` method in "app.js" file.
 4. Finally it must create the table in the **mern_stack_1** Database
 
-## Post /Tasks, the Creation or Insertion of the record
+## POST /Tasks, the Creation or Insertion of the record
 
 1. Add in "app.js" file, two elements below the `const app = express();`.
 ```js
@@ -313,7 +313,7 @@ pnpm install zod -E
 ```
 7. Export the `ValidateTask`, returning the `safeParse` of the `taskSchema`, all in the "tasks.schemas.js" file.
 
-## GET/ Tasks, the Reading all the records or one.
+## GET /Tasks, the Reading all the records or one.
 1. Adding the Process in "tasks.controllers.js" file for `getTasks` method:
 ```js
       try {
@@ -341,4 +341,46 @@ pnpm install zod -E
       } catch (error) { res.status(501).json({ ok: false, error }); }
 ```
 ### Note: A correction in "task.schemas.js" for `regExpUuid`, using the `\\` insted of `\`.
+
+## DELETE /Tasks, Deleting record one by one.
+1. Adding the Process in "tasks.controllers.js" file for `deleteTask` method:
+```js
+      try {
+        const uuid = req.params.id;
+        const valTastk = await validateTask({ id: uuid, title: 'xoxoxo' }); // I sent any garbage in Title for Validation
+        if (valTastk.error) return res.status(400).json({ ok: false, message: valTastk.error });
+        const [rows, fields, error] = await pool.query("DELETE FROM tasks \n" +
+          "WHERE  id= unhex(replace(?,'-',''));", [uuid]);
+        if (rows.length === 0 || rows.affectedRows === 0) return res.status(404).json({ ok: false, message: "Task not found" });
+        res.status(200).json({ ok: true, rows });
+      } catch (error) { res.status(501).json({ ok: false, error }); }
+```
+### Note: Adding some corrections to "task.schemas.js" and it affect the `validateTask` method.
+
+## PUT /Tasks, Update one .
+1. Adding the Process in "tasks.controllers.js" file for `updateTask` method:
+```js
+      try {
+        const uuid = req.params.id;
+        const bodyVal = { ...req.body, "id": uuid };
+        const valTastk = await validateTask(bodyVal, 'U');
+        console.log(req.body, bodyVal);
+        const { title, description, done } = await req.body;
+        if (valTastk.error) return res.status(400).json({ ok: false, message: valTastk.error });
+        const [rows, fields, error] = await pool.query("UPDATE tasks SET updated_at=CURRENT_TIMESTAMP,? \n" +
+          "WHERE  id= unhex(replace(?,'-',''));", [req.body, uuid]);
+        console.log(rows);
+        if (rows.length === 0 || rows.affectedRows === 0) return res.status(404).json({ ok: false, message: "Task not found" });
+
+        res.status(200).json({
+          ok: true,
+          uuid,
+          title: title,
+          description: description,
+          done: done,
+          rows
+        });
+      } catch (error) { res.status(501).json({ ok: false, error }); }
+```
+
 
