@@ -418,7 +418,7 @@ npm init vite@latest frontend --template react-ts
 ```
 6. Delete the "package.json" file of the root.
 7. Move the content "frontend" directory to the root.
-8. Stay in the root" directory, and install `concurrently`, to run two Node commands in parallel.
+8. Stay in the root directory, and install `concurrently`, to run two Node commands in parallel.
 ```bash
 pnpm i concurrently -D
 ```
@@ -439,4 +439,49 @@ pnpm i
 14. Run the command and you must have two servers (backend `express` and frontend `react`) running 
 ```bash
 pnpm dev
+```
+
+## Frontend Setup, Modifying and deleting some files into "src" directory
+1. Delete the "assets" directoryfrom "src" directory.
+2. Delete all inside of "App.tsx" file, run `rfce` snippet, and delete the first line, _not require the import of react_.
+3. Delete all inside of "App.css" file.
+4. Delete all inside of "index.css" file.
+5. Delete tw lines regarding this `<React.StrictMode>` element in "main.tsx" file. After that the first line is not necessary.
+6. In our app, let's go to use many pages then we are going to use [React Router 6](https://v5.reactrouter.com/web/guides/quick-start), run this command:
+```bash
+pnpm install react-router-dom@6
+```
+7. Import `{BrowserRouter}` from 'react-router-dom' in "main.tsx" file, and use that to envolve the `<App>` element:
+```js
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+```
+8. Import `{Routes, Route}` from 'react-router-dom' in "App.tsx" file.
+```js
+      <>
+        <Routes>
+          <Route path="/" element={}/>
+        </Routes>
+      </>
+```
+9. Create a "pages" directory into "src" directory.
+10. Create a "TaskPage.tsx" file into this "pages" directory, run `rfce` snippet. Remember to delete the first line, _not require the import of react_.
+11. In the "App.tsx" file, complete the date after `element={` with the name of this Page or Component.
+12. Create a "TaskForm.tsx" file into this "pages" directory, run `rfce` snippet. Remember to delete the first line, _not require the import of react_.
+13. Add this component associate to `"/new"` site, like this in "App.tsx" file:
+```js
+          <Routes>
+            <Route path="/" element={ <TaskPage/>} />
+            <Route path="/new" element={ <TaskForm/>} />
+          </Routes>
+```
+14. Create a "NotFound.tsx" file into this "pages" directory, run `rfce` snippet. Remember to delete the first line, _not require the import of react_.
+15. Add in "App.tsx" file the `NotFound` component associate to all routes:
+```js
+            <Route path="*" element={<NotFound />} />
+```
+16. Finally I add a barrel in the "pages" directory. A barrel is the "index.ts" file withe list of components to import and export, then the import in "App.tsx" must be only one line:
+```js
+    import { TaskPage, TaskForm, NotFound } from './pages';
 ```
