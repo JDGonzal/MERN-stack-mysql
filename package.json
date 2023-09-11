@@ -1,17 +1,20 @@
 {
-  "name": "mern-stack-mysql",
-  "version": "1.0.0",
-  "description": "Based on this site \r * [MERN Stack con MySQL - React MySQL CRUD (Context API, TailwindCSS)](https://www.youtube.com/watch?v=dJbd7BYofp4) .\r * [MERN Stack Tutorial - Book Store Project](https://www.youtube.com/watch?v=-42K44A1oMA).\r * [Build REST API with NodeJS, MySQL, Sequelize, Typescript, Express step by step 2022 | REST API MySQL](https://www.youtube.com/watch?v=UcwT1SAvxG0).",
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
   "type": "module",
-  "main": "app.js",
+  "main": "./backend/app.js",
   "scripts": {
-    "start": "node ./backend/app.js",
-    "dev": "nodemon ./backend/app.js"
+    "dev:frontend": "vite",
+    "dev:backend": "nodemon ./backend/app.js",
+    "dev": "concurrently 'npm:dev:frontend' 'npm:dev:backend'",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
   },
-  "keywords": [],
-  "author": "Juan David González Piza",
-  "license": "MIT",
   "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "morgan": "^1.10.0",
@@ -19,6 +22,17 @@
     "zod": "3.22.2"
   },
   "devDependencies": {
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitejs/plugin-react-swc": "^3.3.2",
+    "concurrently": "^8.2.1",
+    "eslint": "^8.45.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.3",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.5",
     "nodemon": "^3.0.1"
   }
 }

@@ -383,4 +383,60 @@ pnpm install zod -E
       } catch (error) { res.status(501).json({ ok: false, error }); }
 ```
 
-
+## Frontend Setup, Starting the "React" application install
+1. Stop the "backend" server or the `express` server.
+2. I used [Vite](https://vitejs.dev/guide/), the best way to start any front-end project, with Typescrypt and a lot of templates. Delete the "frontend" directory and run this command in the root:
+```bash
+npm init vite@latest frontend --template react-ts
+```
+3. Delete the "node_modules" directory from the root.
+4. Delete the "README.md" and ".gitignore" files from "frontend" directory
+5. Copy some elements from "/package.json" into "frontend/package.json", to get something like this:
+```js
+      "dependencies": {
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "dotenv": "^16.3.1",
+        "express": "^4.18.2",
+        "morgan": "^1.10.0",
+        "mysql2": "^3.6.0",
+        "zod": "3.22.2"
+      },
+      "devDependencies": {
+        "@types/react": "^18.2.15",
+        "@types/react-dom": "^18.2.7",
+        "@typescript-eslint/eslint-plugin": "^6.0.0",
+        "@typescript-eslint/parser": "^6.0.0",
+        "@vitejs/plugin-react-swc": "^3.3.2",
+        "eslint": "^8.45.0",
+        "eslint-plugin-react-hooks": "^4.6.0",
+        "eslint-plugin-react-refresh": "^0.4.3",
+        "typescript": "^5.0.2",
+        "vite": "^4.4.5",
+        "nodemon": "^3.0.1"
+      }
+```
+6. Delete the "package.json" file of the root.
+7. Move the content "frontend" directory to the root.
+8. Stay in the root" directory, and install `concurrently`, to run two Node commands in parallel.
+```bash
+pnpm i concurrently -D
+```
+9. In the root directory run the command to install all dependencies:
+```bash
+pnpm i
+```
+10. Delete the "frontend" directory.
+11. Add this line below the `"type": "module",` : `"main": "./backend/app.js",`.
+12. Delete in the scripts this line: `"dev": "vite",` and put this three lines:
+```json
+    "dev:frontend": "vite",
+    "dev:backend": "nodemon ./backend/app.js",,
+    "dev": "concurrently 'npm:dev:frontend' 'npm:dev:backend'",
+```
+13. You app’s directory structure should like this::
+![Current Directory structure](images/2023-09-10_185227.png)
+14. Run the command and you must have two servers (backend `express` and frontend `react`) running 
+```bash
+pnpm dev
+```
