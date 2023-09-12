@@ -439,7 +439,7 @@ pnpm i
     "dev:backend": "nodemon ./backend/app.js",,
     "dev": "concurrently 'npm:dev:frontend' 'npm:dev:backend'",
 ```
-13. You app’s directory structure should like this::
+13. You app’s directory structure should like this:
 ![Current Directory structure](images/2023-09-10_185227.png)
 14. Run the command and you must have two servers (backend `express` and frontend `react`) running 
 ```bash
@@ -569,7 +569,8 @@ pnpm i axios -E
       description: string;
     }
 ```
-## Note: always create a barrel or "index.ts" file with the import/export
+> **Note**
+> always create a barrel or "index.ts" file with the import/export
 
 15. Import `{TasksModel}` from '../models', in "TaskForm.tsx" and "tasks.api.ts" files.
 16. Add in the ".env" file just the `VITE_API_URL` to read using `const{VITE_API_URL} = import.meta.env;`: 
@@ -610,13 +611,13 @@ VITE_API_URL=http://localhost:49146/tasks
 > Access to XMLHttpRequest at 'http://localhost:49146/tasks' from origin 'http://localhost:5173' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
 > AxiosError {message: 'Network Error', name: 'AxiosError', code: 'ERR_NETWORK', config: {…}, request: XMLHttpRequest, …}
 
-## CORS error correction in the backend
+## CORS error and correction in the backend
 1. install the `cors` library:
 ```bash
 pnpm i cors -E
 ```
 2. Open the "app.js" file from "backend" directory.
-3. Import `cors` from 'cors' in "apps.js" file.
+3. Import `cors` from 'cors' in "app.js" file.
 4. Add this middelware selecting the frontend server url:
 ```js
     app.use(cors({
@@ -627,4 +628,78 @@ pnpm i cors -E
 > Because in the "/backend/config/config.js" are showing lint error I added in ".eslintrc.cjs" file more in the `env`, regarding `node`:
 ```json
       env: { browser: true, es2020: true, node: true },
+```
+
+## Render Taks, getting the list and showing in screen
+1. Open the "TaskPage.tsx" file.
+2. Import the `{useEffect}` from 'react' in the "TaskPage.tsx" file.
+3. Call the hook below the `function TaskPages()` like this: `useEffect(() =>{},[]);`.
+4. Add in "tasks.api.ts" file a new function above the `createTaskRequest`:
+```js
+    export const readTasksRequest = async()=> {
+      return await axios.get(VITE_API_URL);
+    }
+```
+5. Import `{readTasksRequest}` from '../api' in "TaskPage.tsx" file.
+6. Complete the `useEffect` hook, this a async function inside, in "TaskPage.tsx" file:
+```js
+      useEffect(() => {
+        async function loadTask() {
+          const res = await readTasksRequest();
+          console.log(res.data);
+        }
+        loadTask();
+      }, []);
+``` 
+7. The answer of `readTasksRequest()` is to store in a `useState` hook, remember import from 'react'.
+```js
+    const [tasks, setTasks] = useState([] as TasksModel[]);
+```
+8. Use the `setTasks` after the get the `res` value: `setTasks(res.data.rows);` in "TaskPage.tsx" file.
+9. Make an improvement to the `TasksModel` in "tasks.model.ts" file:
+```js
+    export interface TasksModel {
+      id_text?: string;
+      title: string;
+      description: string;
+      done?:boolean|number;
+      created_at?:Date|string;
+      updated_at?:Date|string;
+    }
+```
+10. Change the `<div>` element to show all the tasks:
+```js
+          <h1>Tasks</h1>
+          {tasks.map(task => (
+            <div key={task.id_text}>
+              <h2>{task.title}</h2>
+              <p>{task.description}</p>
+              <span>{task.done === 1 || task.done === true ? '✅' : '❌'}</span>
+              <span>{task.updated_at as string}</span>
+            </div>
+          ))}
+```
+11. Adding two buttons by each task: `<button>Edit</button>` and`<button>Delete</button>`.
+12 Move all the proccess inside the map to new component, called "TaskCard.tsx", like this:
+```js
+    import { TasksModel } from "../models";
+    function TaskCard(props: { task: TasksModel }) {
+      return (
+        <div>
+          <h2>{props.task.title}</h2>
+          <p>{props.task.description}</p>
+          <span>{props.task.done === 1 || props.task.done === true ? '✅' : '❌'}</span>
+          <span>{props.task.updated_at as string}</span>
+          <button>Edit</button>
+          <button>Delete</button>
+        </div>
+      )
+    }
+    export default TaskCard;
+```
+13. Just call this `TaskCard` component in the "TaskPage.tsk" file:
+```js
+          {tasks.map(task => (
+            <TaskCard task={task} key={task.id_text} />
+          ))}
 ```
