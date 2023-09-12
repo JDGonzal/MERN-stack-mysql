@@ -1,23 +1,18 @@
 import { Formik, Form, Field } from 'formik';
-import { TasksModel } from '../models';
-import { createTaskRequest } from '../api';
+import { initialTask } from '../models';
+import { useTasks } from '../context';
 
 function TaskForm() {
-  const initialValues: TasksModel = { title: '', description: '' };
 
+  const { createTask } = useTasks();
   return (
     <div>
       <h2>Adding a Task</h2>
       <Formik
-        initialValues={initialValues}
+        initialValues={initialTask}
         onSubmit={async (values, actions) => {
           console.log({ values, actions });
-          await createTaskRequest(values)
-            .then((res) => {
-              console.log(res);
-              actions.resetForm();
-            })
-            .catch((err) => console.log(err));
+          await createTask(values, actions.resetForm);
           actions.setSubmitting(false);
         }}
       >
@@ -28,7 +23,7 @@ function TaskForm() {
             />
             <label htmlFor="description">Description</label>
             <Field as="textarea" rows={3} id="description" name="description" placeholder="Write a Description" />
-            <button type="submit" disabled={isSubmitting}>{isSubmitting?"Saving...":"Save"}</button>
+            <button type="submit" disabled={isSubmitting}>{isSubmitting ? "Saving..." : "Save"}</button>
           </Form>)}
       </Formik>
     </div>

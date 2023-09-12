@@ -741,3 +741,87 @@ pnpm i cors -E
         </div>
       )
 ```
+
+## Context Tasks, keep stored the info in memory to better use
+1. Create a "context" directory into "src" directory, and add "TaskContext.tsx" file.
+2. Import `{createContext, FC, ReactNode, useState}` from 'react' in "TaskContext.tsx" file.
+3. Add in "tasks.models.ts" a new type to use in the future in the "TaskContext.tsx" file.
+```js
+    export type TaskContextType = {
+      tasks: TasksModel[];
+    };
+```
+> **Note** 
+> I used this document as guide to complete the `context` with Typescript
+> [How to use React Context with TypeScript](https://blog.logrocket.com/how-to-use-react-context-typescript/)
+4. Add a Interface in "TaskContext.tsx" file to control de `children` use:
+```js
+interface Props {
+  children: ReactNode;
+}
+```
+5. Create a basic `Provider` like this:
+```js
+export const TaskContextProvider: FC<Props> = ({ children }) => {
+  const [tasks, setTasks] = useState<TasksModel[]>([]);
+
+  return (
+    <TaskContext.Provider value={{ tasks }}>
+      {children}
+    </TaskContext.Provider>
+  );
+};
+```
+6. Call this `<TaskContextProvider>` Component in the "App.tsx" file, and envolve all the others components:
+```js
+          <TaskContextProvider>
+            <Navbar />
+            <Routes>
+              <Route path="/" element={<TaskPage />} />
+              <Route path="/new" element={<TaskForm />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </TaskContextProvider>
+```
+7. Add our hook in "TaskContext.tsx" file:
+```js
+    export const useTasks = () => {
+      const context = useContext(TaskContext);
+      if (!context) throw new Error('useTasks must be used within a TasContextProvider');
+      return context;
+    }
+```
+8. Move `loadTask` method from "TaksPage.tsx" to "TaskContext.tsx" file.
+9. Add in `TaskContextType` of "tasks.model.ts" a function like this: 
+```js
+    export type TaskContextType = {
+      tasks: TasksModel[];
+      loadTask: () => void;
+    };
+```
+10. Add in values to return this `loadTask` method:
+```js
+        <TaskContext.Provider value={{ tasks, loadTask }}>
+          {children}
+        </TaskContext.Provider>
+```
+11. Add new function to use in "TaskPage.tsx" file.:
+```js
+    const {tasks, loadTask} = useTasks();
+```
+12. Just Call the function `loadTask();` in `useEffect` of "TaskPage.tsx" file.
+13. Move the `handleDelete` from "TaskForm.tsx" to "TaskContext.tsx" file.
+14. Rename from `handleDelete` to `deleteTasks`;
+15. Add a function in "tasks.model.ts" for `TaskContextType`.
+```js
+    export type TaskContextType = {
+      tasks: TasksModel[];
+      loadTask: () => void;
+      deleteTask: (id_text: string) =>void;
+    };
+```
+16. Return at end in "TaskContext.tsx" file the all values:
+```js
+    <TaskContext.Provider value={{ tasks, loadTask, deleteTask }}>
+```
+17. Repeat the same with `createTask`.
