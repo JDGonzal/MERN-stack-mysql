@@ -1,19 +1,13 @@
-import { useEffect, useState } from 'react';
-import { readTasksRequest } from '../api';
-import { TasksModel } from '../models';
+import { useEffect} from 'react';
+import {useTasks} from '../context';
 import { TaskCard } from '../components';
 
 function TaskPage() {
-  const [tasks, setTasks] = useState([] as TasksModel[]);
+  const {tasks, loadTasks} = useTasks();
   useEffect(() => {
     // I need to add another function to use as `async`
-    async function loadTask() {
-      const res = await readTasksRequest();
-      setTasks(res.data.rows);
-      console.table(tasks);
-      console.log(res.data.rows, tasks);
-    }
-    loadTask();
+    loadTasks();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function renderMain() {
