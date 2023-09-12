@@ -30,7 +30,8 @@ pnpm i express mysql2 morgan
 ```bash
 pnpm i nodemon -D
 ```
-### Note: Those were my dependency versions:
+> **Note**
+> Those were my dependency versions:
 + express 4.18.2
 + morgan 1.10.0
 + mysql2 3.6.0
@@ -85,7 +86,7 @@ Just change the text `x:\path\directory\name`, for the real directory path.
 5. Create in the "backend" directory the "config" directory.
 6. Move the "config.js" file into this new "config" directory.
 7. Add a ".env" file in the root of the directory, with this data:
-```yml
+```yaml
     #------ MYSQL CONNECTION TO ANY SERVER -------
     MYSQL_HOST=localhost
     MYSQL_USER=root
@@ -117,7 +118,8 @@ pnpm i dotenv
 ```
 12. If it is showing in the terminal this `Server is running on port 49146,localhost`, then delete this new info in the "app.js" file.
 
-### Note: In the Video it is an explanation the Creation of a MySQL-Server with a Docker, but I previously have a MySQL Server installed.
+> **Note**
+> In the Video it is an explanation the Creation of a MySQL-Server with a Docker, but I previously have a MySQL Server installed.
 
 13. Lets to a create a Database in MySQL server with the name: `mern_stack_1`, I use to use in "Character set" : `utf8 -- UTF-8 Unicode` and in the "Collation": `utf8_general_ci`.
 14. Finally adding code in the "db.js" file:
@@ -205,7 +207,8 @@ Remember import `tasksRoutes` from './routes/tasks.routes.js', in "app.js" file.
 
 10. You can test as simple in the browser with the two `get` like: [localhost:49146/tasks](http://localhost:49146/tasks) or [localhost:49146/tasks/1](http://localhost:49146/tasks/1)
 
-### Note: To test the other options in "Visual Studio Code" there are a "Thunder Client" extension.
+> **Note**
+> To test the other options in "Visual Studio Code" there are a "Thunder Client" extension.
 
 ## Create the Table called "tasks" in the **mern_stack_1** Database
 1. Create a "database" directory into "backend", and add the "createTasksTable.js" file, with:
@@ -340,7 +343,8 @@ pnpm install zod -E
         res.status(200).json({ ok: true, rows });
       } catch (error) { res.status(501).json({ ok: false, error }); }
 ```
-### Note: A correction in "task.schemas.js" for `regExpUuid`, using the `\\` insted of `\`.
+> **Important**
+> A correction in "task.schemas.js" for `regExpUuid`, using the `\\` insted of `\`.
 
 ## DELETE /Tasks, Deleting record one by one.
 1. Adding the Process in "tasks.controllers.js" file for `deleteTask` method:
@@ -355,7 +359,8 @@ pnpm install zod -E
         res.status(200).json({ ok: true, rows });
       } catch (error) { res.status(501).json({ ok: false, error }); }
 ```
-### Note: Adding some corrections to "task.schemas.js" and it affect the `validateTask` method.
+> **Note**
+> Adding some corrections to "task.schemas.js" and it affect the `validateTask` method.
 
 ## PUT /Tasks, Update one .
 1. Adding the Process in "tasks.controllers.js" file for `updateTask` method:
@@ -484,4 +489,142 @@ pnpm install react-router-dom@6
 16. Finally I add a barrel in the "pages" directory. A barrel is the "index.ts" file withe list of components to import and export, then the import in "App.tsx" must be only one line:
 ```js
     import { TaskPage, TaskForm, NotFound } from './pages';
+```
+
+## Create Task, from react-frontend to express-backend
+1. Create a "components" directory in "src" directory, and Add a "Navbar.tsx" file and run the `rfce` snippet, this is the elements to use:
+```js
+    import { Link } from "react-router-dom";
+    function Navbar() {
+      return (
+        <div>
+          <h1>MERN Stack with MySQL</h1>
+          <ul>
+            <li> <Link to="/">Home</Link> </li>
+            <li> <Link to="/new">Create Task</Link> </li>
+          </ul>
+        </div>
+      )
+    }
+```
+2. Call the `Navbar` component in the "App.tsx" file, above the `<Routes>` element.
+3. For validation of input or values we will use [Formik](https://formik.org/docs/overview), run this command:
+```bash
+pnpm install formik -E
+```
+4. Add the form using the example in this site for Typescript: [TypeScript](https://formik.org/docs/guides/typescript)
+5. Import and create the model or `interface` in "TaskForm.tsx" file:
+```js
+    import { Formik, Form, Field } from 'formik';
+
+    interface MyFormValues {
+      title: string;
+      description: string;
+    }
+```
+6. Define the `initialValues`:
+```js
+    const initialValues: MyFormValues = { title: '', description: '' };
+```
+7. Inside the `<div>` element add the `<Formmik>` and `<Form>` elements from `formik:
+```js
+        <div>
+          <Formik>
+            <Form>
+            </Form>
+          </Formik>
+        </div>
+```
+8. Add two `<label>` element and two `<Field>` elements with the data to read, inside the `<Form>` element:
+```js
+            <Form>
+              <label htmlFor="title">Title</label>
+              <Field type="text" id="title" name="title" placeholder="Write a Title"
+              />
+              <label htmlFor="description">Description</label>
+              <Field as="textarea" rows={3} id="description" name="description" placeholder="Write a Description" />
+              <button type="submit">Add Task</button>
+            </Form>
+```
+9. Complete the  `<Formik>` firs element wiht the data required:
+```js
+          <Formik
+            initialValues={initialValues}
+            onSubmit={(values, actions) => {
+              console.log({ values, actions });
+              actions.setSubmitting(false);
+            }}>
+```
+10. Create a "api" directory in "src" directory.
+11. Install the `axios` library
+```bash
+pnpm i axios -E
+```
+12. Add a "tasks.api.ts" file in "src/api" directory.
+13. Create a "models" directory in "src" directory, and add a "tasks.models.ts" file.
+14. Move from "TaskFrom.tsx" the `interface` and put into "tasks.model.ts" file, with an `export`, renem the `interface` name:
+```js
+    export interface TasksModel {
+      title: string;
+      description: string;
+    }
+```
+## Note: always create a barrel or "index.ts" file with the import/export
+
+15. Import `{TasksModel}` from '../models', in "TaskForm.tsx" and "tasks.api.ts" files.
+16. Add in the ".env" file just the `VITE_API_URL` to read using `const{VITE_API_URL} = import.meta.env;`: 
+```yaml
+#------REACT+VITE API DATA
+VITE_API_URL=http://localhost:49146/tasks
+```
+17. In the "tasks.api.ts" file, import `axios` from 'axios'.
+18. Add in "tasks.api.ts" file, a function like this, using the axios as a `post`:
+```js
+    export const createTaskRequest= async(task:TasksModel)=>{
+      await axios.post(VITE_API_URL, task);
+    };
+```
+19. Import `{createTaskRequest}` from '../api' in "TaskForm.tsx" file.
+20. Change the `onSubmit` of "TaskForm.tsk" file to use the `createTaskRequest`:
+```js
+            onSubmit={async(values, actions) => {
+              console.log({ values, actions });
+              await createTaskRequest(values);
+              actions.setSubmitting(false);
+            }}
+```
+21. Return a value and put a `.then` and `.catch` in "TaskForm.tsk" file :
+```js
+              await createTaskRequest(values)
+                .then((res) => console.log(res))
+                .catch((err) => console.log(err));
+```
+22. Clear the from below the `console.log(res);` just adding `actions.resetForm();`, inside the `.then`.
+23. Envolve the `<Form>` element with `{({ isSubmitting }) => (<Form>...</Form>)`.
+24. Use this `isSubmitting` in the `<button>` element:
+```js
+              <button type="submit" disabled={isSubmitting}>{isSubmitting?"Saving...":"Save"}</button>
+```
+25. Try to Create the first task and get an expected error the `cors` error:
+
+> Access to XMLHttpRequest at 'http://localhost:49146/tasks' from origin 'http://localhost:5173' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+> AxiosError {message: 'Network Error', name: 'AxiosError', code: 'ERR_NETWORK', config: {…}, request: XMLHttpRequest, …}
+
+## CORS error correction in the backend
+1. install the `cors` library:
+```bash
+pnpm i cors -E
+```
+2. Open the "app.js" file from "backend" directory.
+3. Import `cors` from 'cors' in "apps.js" file.
+4. Add this middelware selecting the frontend server url:
+```js
+    app.use(cors({
+      origin: ['http://localhost:5173',],
+    }));
+```
+> **Note**
+> Because in the "/backend/config/config.js" are showing lint error I added in ".eslintrc.cjs" file more in the `env`, regarding `node`:
+```json
+      env: { browser: true, es2020: true, node: true },
 ```
