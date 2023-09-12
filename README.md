@@ -703,3 +703,41 @@ pnpm i cors -E
             <TaskCard task={task} key={task.id_text} />
           ))}
 ```
+
+## Delete Tasks, using the button by each task in the TaskCard
+1. Add an action to the `<button>Delete</button>` called `onClick`, in "TaskCard.tsx" file.
+2. Add a function in "task.api.ts".
+```js
+    export const deleteTasksRequest = async (id_text: string) => {
+      return await axios.delete(`${VITE_API_URL}/${id_text}`);
+    }
+```
+3. Create a function in "TaskCard.tsx" file to `handleDelete`:
+```js
+    const handleDelete = async (id_text: string) => {
+      try {
+        const res = await deleteTasksRequest(id_text);
+        console.log(res);
+      } catch (err) { console.log(err); }
+    }
+```
+4. Call this function in the `<button>Delete` element:
+```js
+          <button onClick={() => { handleDelete(props.task.id_text as string); }}>Delete</button>
+```
+5. Move the `tasks.map` of "TaskPage.tsx" to a function in the same file:
+```js
+      function renderMain() {
+        if (tasks.length===0) return <h1>No Task yet</h1>
+        return tasks.map(task => (<TaskCard task={task} key={task.id_text} />)) 
+      }
+```
+6. Just call the function in the last return:
+```js
+      return (
+        <div>
+          <h1>Tasks</h1>
+          {renderMain()}
+        </div>
+      )
+```
