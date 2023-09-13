@@ -924,3 +924,28 @@ export const TaskContextProvider: FC<Props> = ({ children }) => {
           >
 ```
 18. After Edit back to "/" root page, using navigate of 'react-router-dom' in "TaskForm.tsx" file.
+
+## Toggle Done, Changing the "Done" status as Edit but just one field.
+1. Add a button in "TaskCard.tsx" file: `<button>Toggle Taks</button>`.
+2. Add an acction `onClick()` to this new button in "TaskCard.tsx" calling a function:
+```js
+      const handleDone = () => {
+        (props.task.done === 1 || props.task.done === true )?props.task.done=0:props.task.done=1;
+        updateTask(props.task);
+      }
+```
+3. Change in "TaskContext.tsx" file the `updateTask`, like this:
+```js
+      const updateTask = async (task: TasksModel) => {
+        await updateTaskRequest(task)
+          .then(async (res) => {
+            console.log(res);
+            await readTask(res.data.id_text as string)
+              .then((lastTask) => {
+                console.log('lastTask:', lastTask);
+                setTasks(tasks.map((taskMap) => taskMap.id_text === lastTask.id_text ? lastTask : taskMap));
+              })
+          })
+          .catch((err) => console.log(err));
+      }
+```

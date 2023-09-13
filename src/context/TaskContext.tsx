@@ -48,18 +48,17 @@ export const TaskContextProvider: FC<Props> = ({ children }) => {
 
   const updateTask = async (task: TasksModel) => {
     await updateTaskRequest(task)
-      .then((res) => {
+      .then(async (res) => {
         console.log(res);
+        await readTask(res.data.id_text as string) 
+          .then((lastTask) => {
+            console.log('lastTask:', lastTask);
+            setTasks(tasks.map((taskMap) => taskMap.id_text === lastTask.id_text ? lastTask : taskMap));
+          })
       })
       .catch((err) => console.log(err));
   }
-  // Those Below if wanna add to updateTask inse the .then()
-  // setTasks(tasks.filter(task => task.id_text !== id_text));
-  // tasks.filter((task: TasksModel) => {
-  //   if (task.id_text === id_text) {
-  //     task.done = true
-  //     setTasks([...tasks])
-  //   }
+
   const deleteTask = async (id_text: string) => {
     try {
       const res = await deleteTasksRequest(id_text);

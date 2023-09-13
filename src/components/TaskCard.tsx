@@ -4,8 +4,13 @@ import { useNavigate } from 'react-router-dom';
 
 function TaskCard(props: { task: TasksModel }) {
 
-  const { deleteTask } = useTasks();
+  const { deleteTask, updateTask } = useTasks();
   const navigate = useNavigate();
+
+  const handleDone = () => {
+    (props.task.done === 1 || props.task.done === true )?props.task.done=0:props.task.done=1;
+    updateTask(props.task);
+  }
 
   return (
     <div>
@@ -15,6 +20,7 @@ function TaskCard(props: { task: TasksModel }) {
       <span>{props.task.updated_at as string}</span>
       <button onClick={() => { navigate(`/edit/${props.task.id_text}`) }}>Edit</button>
       <button onClick={() => { deleteTask(props.task.id_text as string); }}>Delete</button>
+      <button onClick={() => { handleDone()}}>Toggle Taks</button>
     </div>
   )
 }
