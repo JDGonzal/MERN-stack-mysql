@@ -17,8 +17,11 @@ function TaskPage() {
 
   return (
     <div>
-      <h1>Tasks</h1>
-      {renderMain()}
+      <h1 className="text-5xl text-center">Tasks</h1>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+        {renderMain()}
+      </div>
+      
     </div>
   )
 }
