@@ -1045,3 +1045,34 @@ npx tailwindcss init -p
                   <button className=" bg-green-600 text-slate-200 rounded-md py-2 px-4 hover:bg-green-400 hover:text-white" type="submit" disabled={isSubmitting}>{isSubmitting ? "Saving..." : "Save"}</button>
                 </div>
 ```
+## Deploy using only one element to run
+1. Run a command in the frontend side to build, to create a "/dist/" directory:
+```bash
+pnpm build
+``` 
+2. Check the "/dist/" directory, it mus have at least three files:
+* dist/index.html                   
+* dist/assets/index-3552568a.css   
+* dist/assets/index-ec470266.js  
+
+3. Open the "app.js" file from "/backend" directory.
+4. Import `{dirname, join}` from 'path', and use to create a `const`:
+```js
+    const __dirname =dirname(fileURLToPath(import.meta.url));
+```
+5. Add above the `app.listen` this line:
+```js
+    app.use(express.static(join(__dirname, '../dist'))); //* The path where is the build of vite
+```
+6. Add new element in "package.json" in `"scripts":`
+```json
+        "start": "node ./backend/app.js",
+```
+# Finally this is all you need to run all proyect
+```bash
+pnpm start
+```
+> **Note**
+> You can access the frontend page with this url [localhost:49146](http://localhost:49146/)
+
+![Frontend running using backend](images/2023-09-13_174523.png)
