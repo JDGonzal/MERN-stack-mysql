@@ -1,18 +1,18 @@
-import { useEffect} from 'react';
-import {useTasks} from '../context';
+import { useEffect } from 'react';
+import { useTasks } from '../context';
 import { TaskCard } from '../components';
 
 function TaskPage() {
-  const {tasks, loadTasks} = useTasks();
+  const { tasks, readTasks } = useTasks();
   useEffect(() => {
     // I need to add another function to use as `async`
-    loadTasks();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    readTasks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function renderMain() {
-    if (tasks.length===0) return <h1>No Task yet</h1>
-    return tasks.map(task => (<TaskCard task={task} key={task.id_text} />)) 
+    if (tasks.length === 0) return <h1>No Task yet</h1>
+    return tasks.map(task => (<TaskCard task={task} key={task.id_text} />))
   }
 
   return (

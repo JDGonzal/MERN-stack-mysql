@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createContext, FC, ReactNode, useState, useContext } from 'react';
 import { TasksModel, TaskContextType, initialTask } from '../models';
-import { createTaskRequest, deleteTasksRequest, readTasksRequest } from '../api';
+import { createTaskRequest, readTasksRequest, readTaskRequest, updateTaskRequest, deleteTasksRequest } from '../api';
 
 export const TaskContext = createContext<TaskContextType | null>(null);
 
@@ -20,13 +20,46 @@ export const TaskContextProvider: FC<Props> = ({ children }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [tasks, setTasks] = useState<TasksModel[]>([initialTask]);
 
-  const loadTasks = async () => {
-    const res = await readTasksRequest();
-    setTasks(res.data.rows);
-    console.table(tasks);
-    console.log(res.data.rows, tasks);
+  const createTask = async (task: TasksModel, anyfunction: any) => {
+    await createTaskRequest(task)
+      .then((res) => {
+        console.log(res);
+        anyfunction();
+        // setTasks([...tasks, task]); // ther are pending the Create_at and Update_at fields
+      })
+      .catch((err) => console.log(err));
   }
 
+  const readTasks = async () => {
+    try {
+      const res = await readTasksRequest();
+      console.table(res.data.rows);
+      setTasks(res.data.rows);
+    } catch (err) { console.log(err); }
+  }
+
+  const readTask = async (id_text: string) => {
+    try {
+      const res = await readTaskRequest(id_text);
+      console.table(res.data.rows[0]);
+      return res.data.rows[0];
+    } catch (err) { console.log(err); }
+  }
+
+  const updateTask = async (task: TasksModel) => {
+    await updateTaskRequest(task)
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => console.log(err));
+  }
+  // Those Below if wanna add to updateTask inse the .then()
+  // setTasks(tasks.filter(task => task.id_text !== id_text));
+  // tasks.filter((task: TasksModel) => {
+  //   if (task.id_text === id_text) {
+  //     task.done = true
+  //     setTasks([...tasks])
+  //   }
   const deleteTask = async (id_text: string) => {
     try {
       const res = await deleteTasksRequest(id_text);
@@ -34,26 +67,9 @@ export const TaskContextProvider: FC<Props> = ({ children }) => {
       console.log(res);
     } catch (err) { console.log(err); }
   }
-  const createTask = async (task: TasksModel, anyfunction: any) => {
-    await createTaskRequest(task)
-      .then((res) => {
-        console.log(res);
-        anyfunction();
-        // setTasks([...tasks, task]);
-      })
-      .catch((err) => console.log(err));
-  }
 
-  // const updateTodo = (id_text: string) => {
-  // tasks.filter((task: TasksModel) => {
-  //   if (task.id_text === id_text) {
-  //     task.done = true
-  //     setTasks([...tasks])
-  //   }
-  // });
-  // }
   return (
-    <TaskContext.Provider value={{ tasks, loadTasks, deleteTask, createTask/* updateTodo */ }}>
+    <TaskContext.Provider value={{ tasks, createTask, readTasks, readTask, updateTask, deleteTask }}>
       {children}
     </TaskContext.Provider>
   );

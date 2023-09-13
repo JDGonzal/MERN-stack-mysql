@@ -1,18 +1,48 @@
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Formik, Form, Field } from 'formik';
-import { initialTask } from '../models';
+import { TasksModel, initialTask } from '../models';
 import { useTasks } from '../context';
 
-function TaskForm() {
+const isEditOrUpdate = (params: string, url: string) => {
+  let id_text = '';
+  if (params.length > 36) id_text = JSON.parse(params).id_text;
+  if (id_text.length === 36 && url === '/edit/') return true;
+  return false;
+}
 
-  const { createTask } = useTasks();
+function TaskForm() {
+  const { createTask, readTask, updateTask } = useTasks();
+  const [task, setTask] = useState<TasksModel>(initialTask);
+  const params = useParams();
+  const navigate = useNavigate();
+
+  const url = window.location.href.slice(-42).substring(0, 6);
+  console.log(params, url);
+
+  useEffect(() => {
+    const loadTask = async () => {
+      if (isEditOrUpdate(JSON.stringify(params), url)) {
+        const data = await readTask(params.id_text as string);
+        await setTask(data);
+      }
+    };
+    loadTask();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div>
-      <h2>Adding a Task</h2>
+      <h2>{isEditOrUpdate(JSON.stringify(params), url) ? 'Edit Task' : 'Adding a Task'}</h2>
       <Formik
-        initialValues={initialTask}
+        initialValues={task}
+        enableReinitialize={true}
         onSubmit={async (values, actions) => {
           console.log({ values, actions });
-          await createTask(values, actions.resetForm);
+          if (isEditOrUpdate(JSON.stringify(params), url)) {
+            updateTask(values);
+            navigate("/");
+          } else { await createTask(values, actions.resetForm); }
           actions.setSubmitting(false);
         }}
       >

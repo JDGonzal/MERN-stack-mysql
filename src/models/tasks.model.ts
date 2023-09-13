@@ -19,8 +19,9 @@ export const initialTask: TasksModel = {
 
 export type TaskContextType = {
   tasks: TasksModel[];
-  loadTasks: () => void;
-  deleteTask: (id_text: string) =>void;
-  createTask: (task: TasksModel, anyfunction:any) => void;
-  // updateTodo: (id_text: string) => void;
+  createTask: (task: TasksModel, anyfunction: any) => void;
+  readTasks: () => void;
+  readTask: (id_text: string) => Promise<TasksModel>;
+  updateTask: (task: TasksModel) => void;
+  deleteTask: (id_text: string) => void;
 };
