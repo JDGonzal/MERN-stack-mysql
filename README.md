@@ -562,7 +562,7 @@ pnpm i axios -E
 ```
 12. Add a "tasks.api.ts" file in "src/api" directory.
 13. Create a "models" directory in "src" directory, and add a "tasks.models.ts" file.
-14. Move from "TaskFrom.tsx" the `interface` and put into "tasks.model.ts" file, with an `export`, renem the `interface` name:
+14. Move from "TaskForm.tsx" the `interface` and put into "tasks.model.ts" file, with an `export`, renem the `interface` name:
 ```js
     export interface TasksModel {
       title: string;
@@ -825,3 +825,102 @@ export const TaskContextProvider: FC<Props> = ({ children }) => {
     <TaskContext.Provider value={{ tasks, loadTask, deleteTask }}>
 ```
 17. Repeat the same with `createTask`.
+
+## Update Task
+1. The `<button>Edit</button>` in "TaskCard.tsx" file must redidirect to "TaskForm.tsx".
+2. Add new route in "App.tsx" file : `<Route path="/edit/:id_text" element={<TaskForm />} />`.
+3. Add the acction to the `<button>Edit`, like this: `<button onClick={() =>{}}>Edit</button>` in "Taskcard.tsx" file.
+4. Import `{useNavigate}` from 'react-router-dom', and assing to variable lie : `const navigate = useNavigate();`.
+5. To the acction in `<button>Edit`, change like this:
+```js
+          <button onClick={() => { navigate(`/edit/${props.task.id_text}`) }}>Edit</button>
+```
+6. Import `{useParams}` from 'react-router-dom' in "TaskForm.tsx" file, and assig to a const.
+7. Add a function to validate if is Editing in "TaskForm.tsx" file:
+```js
+    const isEditOrUpdate = (params: string, url: string) => {
+      let id_text = '';
+      if (params.length > 36) id_text = JSON.parse(params).id_text;
+      if (id_text.length === 36 && url === '/edit/') return true;
+      return false;
+    }
+```
+8. Import `{useEffect, useState}` from 'react' in in "TaskForm.tsx" file.
+9. Add in "tasks.api.ts" a new function to import using the Edit:
+```js
+    export const readTaskRequest = async (id_text: string) => {
+      return await axios.get(`${VITE_API_URL}/${id_text}`);
+    }
+```
+10. Import this `readTaskRequest` in the "TaskContext.tsx" file.
+11. Add the function `` in "TaskContext.tsx" file:
+```js
+      const readTask = async (id_text: string) => {
+        const res = await readTaskRequest(id_text);
+        return res.data.rows[0];
+      }
+```
+12. Add the elements in return in the "TaskContext.tsx" file and the `TaskContextType` of "tasks.models.ts" file:
+```js
+    export type TaskContextType = {
+      ...
+      readTask: (id_text: string) => Promise<TasksModel>;
+      ....
+    };
+```
+13. Add the `useEffect` and `useState` in "TaskForm.tsx" file:
+```js
+      const [task, setTask] = useState<TasksModel>(initialTask);
+      ...
+      useEffect(() => {
+        const loadTask = async () => {
+          if (isEditOrUpdate(JSON.stringify(params), url)) {
+            const data = await readTask(params.id_text as string);
+            await setTask(data);
+          }
+        };
+        loadTask();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, []);
+```
+14. For the `<Formik>` element cahnge the initial value and call another function:
+```js
+      <Formik
+        initialValues={task}
+        enableReinitialize={true}
+        ...
+      >
+```
+> **Note**
+> In backend I have to do a change in "task.shemas.js" file for `taskSchemaUpdate` :
+```js
+    const taskSchemaUpdate = z.object({
+      ...
+      done: z.boolean().optional().or(z.number().min(0).max(1)),
+    });
+```
+15. Add in "tasks.model.ts" file in `TaskContextType` another function: `updateTask: (task: TasksModel) => void;`.
+16. Add the function in "TaskContext.tsx" file:
+```js
+      const updateTask = async (task: TasksModel) => {
+        await updateTaskRequest(task)
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((err) => console.log(err));
+      }
+```
+17. Call in "TaskForm.tsx" file this `updateTask` , like this:
+```js
+          <Formik
+            ...
+            onSubmit={async (values, actions) => {
+              console.log({ values, actions });
+              if (isEditOrUpdate(JSON.stringify(params), url)) {
+                updateTask(values)
+              } else { await createTask(values, actions.resetForm); }
+              actions.setSubmitting(false);
+            }}
+          >
+```
+18. After Edit back to "/" root page, using navigate of 'react-router-dom' in "TaskForm.tsx" file.

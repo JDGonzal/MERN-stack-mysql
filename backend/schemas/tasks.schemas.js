@@ -19,8 +19,9 @@ const taskSchemaUpdate = z.object({
   id: z.string({required_error: 'Id is required'}).regex(regExpUuid, { message: 'Id is not valid' }),
   title: z.string().min(5).max(128, { message: 'Title is max 128 length' }).regex(regExpText, { message: 'Title is not valid' }).optional(),
   description: z.string().max(256, { message: 'Description is max 256 length' }).regex(regExpText, { message: 'Description is not valid' }).optional(),
-  done: z.boolean().optional(),
+  done: z.boolean().optional().or(z.number().min(0).max(1)),
 });
+
 const taskSchemaDelete = z.object({
   id: z.string({required_error: 'Id is required'}).regex(regExpUuid, { message: 'Id is not valid' }),
 });
