@@ -949,3 +949,99 @@ export const TaskContextProvider: FC<Props> = ({ children }) => {
           .catch((err) => console.log(err));
       }
 ```
+
+## Tailwind CSS, puttins some Style to our frontend application
+1. The process of installation is based on this site [Tailwind CSS](https://tailwindcss.com/docs/installation), and select "Framework Guides" option.
+2. Becasue I used the "Vite", select "Vite". 
+3. Run this command of the 2 step "Install Tailwind CSS" option, in a terminal:
+```bash
+pnpm install -D tailwindcss postcss autoprefixer
+```
+4. Run this process to Initialize the tailwind css or create the config Tailwind file:
+```bash
+npx tailwindcss init -p
+```
+5. Add the paths into the `content: [],` to all of your template files in your "tailwind.config.js" file.
+```json
+      content: [
+        "./index.html",
+        "./src/**/*.{js,ts,jsx,tsx}",
+      ],
+```
+6. Delete all code into "scr/index.css" file, to let only the `@tailwind` directives:
+```js
+    @tailwind base;
+    @tailwind components;
+    @tailwind utilities;
+```
+7. Stop the App an run again the App (`pnpm dev`).
+8. Change in "App.tsx" file the `<>` Elemento to a `<div>` and add a `className`:
+```js
+        <div className="bg-slate-300 h-screen">
+```
+9. Change in "Navbar.tsx" file the first <div> adding a `className`:
+```js
+        <div className=" bg-slate-400 flex justify-between px-10 sm:px-3 py-3 z-5">
+```
+10. Change the "TaskCard.tsx" file the first  `<div>` element:
+```js
+        <div className="bg-zinc-600 text-blue-200 rounded-md p-4">
+```
+11. Change the "TaskForm.tsx" file the first `<Form>` element:
+```js
+              <Form className="grid bg-slate-500 px-4 py-6 rounded-md max-w-md mx-auto">
+```
+12. Change the "TaskPage.tsx" file the `<div>` before the `{renderMain()}` and `<h1>`.
+```js
+          <h1 className="text-5xl text-center">Tasks</h1>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+```
+13. Then Change the other elements in "Navbar.tsx" file:
+```js
+          <h1 className="text-2xl lg:text-3xl">MERN Stack with MySQL</h1>
+          <ul className="text-sm md:text-base flex justify-center gap-2 md:gap-6" >
+            <li className="flex p-2  bg-blue-300 rounded-md hover:bg-blue-500">
+              <Link to="/" >Home</Link>
+            </li>
+            <li className="flex p-2 bg-blue-300 rounded-md hover:bg-blue-500">
+              <Link to="/new" >Create Task</Link>
+            </li>
+          </ul>        
+```
+14. Change the other elements in "TaskCard.tsx" file:
+```js
+      <header className="flex justify-between">
+        <h2 className="text-xl text-center font-bold">{props.task.title}</h2>
+        <span>{props.task.done === 1 || props.task.done === true ? '✅' : '❌'}</span>
+      </header>
+      <div className="block">
+        <p className="text-xs">{props.task.description}</p>
+      </div>
+      <div className="block">
+        <span className="text-sm">{String(props.task.updated_at).substring(0, 16)}</span>
+      </div>
+      <div className="flex flex-col-3 text-xs gap-3 pt-6">
+        <button className="bg-blue-500 px-2 py-1 rounded-md hover:bg-blue-700"
+          onClick={() => { navigate(`/edit/${props.task.id_text}`) }}>Edit</button>
+        <button className="bg-red-600 px-2 py-1 rounded-md hover:bg-red-800"
+          onClick={() => { deleteTask(props.task.id_text as string); }}>Delete</button>
+        <button className="bg-orange-500 px-2 py-1 rounded-md hover:bg-orange-700"
+          onClick={() => { handleDone() }}>Status</button>
+      </div>
+```
+15. Change the other elements in "TaskForm.tsx" file:
+```js
+                <h2 className="text-xl font-bold uppercase text-center">
+                  {isEditOrUpdate(JSON.stringify(params), url) ? 'Edit Task' : 'Adding a Task'}
+                </h2>
+                <div className="">
+                  <label htmlFor="title" className="block">Title</label>
+                  <Field className="px-2 py1 rounded-mdv w-full" type="text" id="title" name="title" placeholder="Write a Title"
+                  />
+                  <label htmlFor="description" className="block">Description</label>
+                  <Field className="px-2 py1 rounded-md w-full" as="textarea" rows={3} id="description" name="description" placeholder="Write a Description" />
+                </div>
+                <div className="flex justify-end">
+                  <button className=" bg-green-600 text-slate-200 rounded-md py-2 px-4 hover:bg-green-400 hover:text-white" type="submit" disabled={isSubmitting}>{isSubmitting ? "Saving..." : "Save"}</button>
+                </div>
+```

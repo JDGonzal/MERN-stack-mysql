@@ -1,14 +1,14 @@
 import { Link } from "react-router-dom";
 function Navbar() {
   return (
-    <div >
-      <h1>MERN Stack with MySQL</h1>
-      <ul className="flex-container" style={{ display: "flex", padding:"10px",marginRight:"5px"}}>
-        <li>
-          <Link to="/" style={{marginRight:"25px", float: "right"}}>Home</Link>
+    <div className=" bg-slate-400 flex justify-between px-10 sm:px-3 py-3 z-5">
+      <h1 className="text-2xl lg:text-3xl">MERN Stack with MySQL</h1>
+      <ul className="text-sm md:text-base flex justify-center gap-2 md:gap-6" >
+        <li className="flex p-2  bg-blue-300 rounded-md hover:bg-blue-500">
+          <Link to="/" >Home</Link>
         </li>
-        <li>
-          <Link to="/new" style={{marginRight:"25px", float: "right"}}>Create Task</Link>
+        <li className="flex p-2 bg-blue-300 rounded-md hover:bg-blue-500">
+          <Link to="/new" >Create Task</Link>
         </li>
       </ul>
     </div>
